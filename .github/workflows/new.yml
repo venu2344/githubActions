@@ -8,12 +8,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout the main branch
+      - name: Job name 01
         uses: actions/checkout@v2
         with:
           ref: main  # Adjust this if your main branch is named differently
 
-      - name: Create a new branch
+      - name: This is job name
         run: |
           NEW_BRANCH="new-branch-name"  # Replace with your desired branch name
           git checkout -b $NEW_BRANCH
