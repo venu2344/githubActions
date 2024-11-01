@@ -1,0 +1,42 @@
+name: Create Promotion Branch, Merge Feature, and Create PR
+
+on:
+  push:
+    branches:
+      - main # Changed target branch to 'main'
+
+jobs:
+  create-promotion-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the main branch
+        uses: actions/checkout@v2
+        with:
+          ref: main # Changed target branch to 'main'
+
+      - name: Create promotion branch
+        run: |
+          git checkout -b promotion
+          git commit --allow-empty -m "Create promotion branch from main" # Adjust commit message
+          git push origin promotion
+
+      - name: Checkout feature branch
+        run: |
+          git fetch origin feature-branch # Replace with your feature branch name
+          git checkout feature-branch
+
+      - name: Merge feature branch into promotion
+        run: |
+          git checkout promotion
+          git merge feature-branch --no-ff -m "Merge feature-branch into promotion" # Replace with your feature branch name
+          git push origin promotion
+
+      - name: Create Pull Request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create --base main --head promotion --title "Merge Promotion to Main" --body "This PR merges the promotion branch into the main branch."
+
+      - name: Complete
+        run: echo "Pull request created successfully."
