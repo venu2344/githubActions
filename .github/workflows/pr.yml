@@ -5,6 +5,9 @@ on:
     branches:
       - 'feature/'  # Trigger on any branch that starts with 'feature/'
 
+on:
+  workflow_dispatch:  # This allows you to trigger the workflow manually
+
 jobs:
   merge-feature:
     runs-on: ubuntu-latest
