@@ -1,20 +1,36 @@
-name: PR for release branch
+name: Merge Feature to Promotion
+
 on:
   push:
     branches:
-      - 0.1.0
+      - 'feature/*'  # Trigger on any branch that starts with 'feature/'
+
 jobs:
-  release_pull_request:
+  merge-feature:
     runs-on: ubuntu-latest
-    name: release_pull_request
+
     steps:
-    - name: checkout
-      uses: actions/checkout@v1
-    - name: Create PR to branch
-      uses: gorillio/github-action-cherry-pick@master
-      with:
-        pr_branch: '0.1.x'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITBOT_EMAIL: <BOT_EMAIL>
-        DRY_RUN: false
+      - name: Checkout feature branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}  # Check out the feature branch that triggered the workflow
+
+      - name: Checkout the promotion branch
+        run: |
+          git fetch origin
+          git checkout new-branch-name  # Replace with your actual promotion branch name
+          git pull origin promotion-branch
+
+      - name: Merge feature branch into promotion branch
+        run: |
+          git merge ${{ github.ref }} --no-ff -m "Merging changes from feature branch ${{ github.ref }} into promotion branch"
+          git push origin new-branch-name
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Promote changes from promotion branch to main"
+          body: "This PR merges changes from the promotion branch into main."
+          base: main
+          head: new-branch-name # Replace with your actual promotion branch name
