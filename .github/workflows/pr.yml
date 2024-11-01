@@ -3,7 +3,7 @@ name: Merge Feature to Promotion
 on:
   push:
     branches:
-      - 'feature/*'  # Trigger on any branch that starts with 'feature/'
+      - 'feature/'  # Trigger on any branch that starts with 'feature/'
 
 jobs:
   merge-feature:
