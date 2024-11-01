@@ -24,10 +24,11 @@ jobs:
 
       - name: Merge feature branch into promotion branch
         run: |
-          git merge ${{ github.ref }} --no-ff --allow-unrelated-histories -m "Merging changes from feature branch ${{ github.ref }} into new-branch-name"
+          git merge ${{ github.ref }} --no-ff --allow-unrelated-histories -m "Merging changes from feature branch ${{ github.ref }} into new-branch-name" || { echo "Merge conflict occurred. Please resolve conflicts in the new-branch-name branch."; exit 1; }
           git push origin new-branch-name  # Push the updated promotion branch
 
       - name: Create Pull Request
+        if: success()  # Only create a PR if the merge was successful
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
