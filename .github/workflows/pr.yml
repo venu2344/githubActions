@@ -22,17 +22,21 @@ jobs:
           git checkout new-branch-name  # Checkout the actual promotion branch
           git pull origin new-branch-name  # Pull the latest changes from the remote
 
-      - name: Merge feature branch into promotion branch
+      - name: Attempt to Merge Feature Branch
         run: |
-          git merge ${{ github.ref }} --no-ff --allow-unrelated-histories -m "Merging changes from feature branch ${{ github.ref }} into new-branch-name" || { echo "Merge conflict occurred. Please resolve conflicts in the new-branch-name branch."; exit 1; }
-          git push origin new-branch-name  # Push the updated promotion branch
+          if git merge ${{ github.ref }} --no-ff --allow-unrelated-histories; then
+            git push origin new-branch-name
+          else
+            echo "Merge conflict detected. Creating pull request for manual resolution."
+            exit 1  # Fail the job so the workflow stops here
+          fi
 
       - name: Create Pull Request
-        if: success()  # Only create a PR if the merge was successful
+        if: failure()  # Only run this step if the previous step failed
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: "Promote changes from new-branch-name to main"
-          body: "This PR merges changes from the new-branch-name into main."
-          base: main
-          head: new-branch-name  # Use the actual promotion branch name
+          title: "Resolve merge conflicts between feature branch and new-branch-name"
+          body: "Merge conflicts detected. Please resolve manually."
+          base: new-branch-name
+          head: ${{ github.ref }}  # The feature branch that triggered the workflow
