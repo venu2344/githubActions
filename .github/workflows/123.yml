@@ -1,65 +1,22 @@
-name: Step 1, Create a branch
+name: Create Branch
 
-# This step listens for the learner to create branch `my-first-branch`.
-# This workflow updates from step 1 to step 2.
-
-# This will run every time we create a branch or tag.
-# Reference: https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
 on:
-  workflow_dispatch:
-  create:
-
-# Reference: https://docs.github.com/en/actions/security-guides/automatic-token-authentication
-permissions:
-  # Need `contents: read` to checkout the repository.
-  # Need `contents: write` to update the step metadata.
-  contents: write
+  workflow_dispatch:  # This allows you to trigger the workflow manually
 
 jobs:
-  # Get the current step to only run the main job when the learner is on the same step.
-  get_current_step:
-    name: Job name
+  create-branch:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - id: get_step
+      - name: Job name 01
+        uses: actions/checkout@v2
+        with:
+          ref: main  # Adjust this if your main branch is named differently
+
+      - name: This is job name
         run: |
-          echo "current_step=$(cat ./.github/steps/-step.txt)" >> $GITHUB_OUTPUT
-    outputs:
-      current_step: ${{ steps.get_step.outputs.current_step }}
-
-  on_create_a_branch:
-    name: job name
-    needs: get_current_step
-
-    # We will only run this action when:
-    # 1. This repository isn't the template repository.
-    # 2. The step is currently 1.
-    # 3. The event is a branch.
-    # 4. The branch name is `my-first-branch`.
-    # Reference: https://docs.github.com/en/actions/learn-github-actions/contexts
-    # Reference: https://docs.github.com/en/actions/learn-github-actions/expressions
-    if: >-
-      ${{ !github.event.repository.is_template
-          && needs.get_current_step.outputs.current_step == 1
-          && github.ref_type == 'branch'
-          && github.ref_name == 'my-first-branch' }}
-    # We'll run Ubuntu for performance instead of Mac or Windows.
-    runs-on: ubuntu-latest
-
-    steps:
-      # We'll need to check out the repository so that we can edit the README.
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Let's get all the branches.
-
-      # In README.md, switch step 1 for step 2.
-      - name: Update to step 2
-        uses: skills/action-update-step@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          from_step: 1
-          to_step: 2
-          branch_name: my-first-branch
+          NEW_BRANCH="new-branch-name"  # Replace with your desired branch name
+          git checkout -b $NEW_BRANCH
+          git push origin $NEW_BRANCH
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Automatically provided by GitHub Actions
