@@ -18,7 +18,7 @@ permissions:
 jobs:
   # Get the current step to only run the main job when the learner is on the same step.
   get_current_step:
-    name: Check current step number
+    name: Job name
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,7 +30,7 @@ jobs:
       current_step: ${{ steps.get_step.outputs.current_step }}
 
   on_create_a_branch:
-    name: On create a branch
+    name: job name
     needs: get_current_step
 
     # We will only run this action when:
