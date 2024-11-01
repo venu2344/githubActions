@@ -16,22 +16,22 @@ jobs:
         with:
           ref: ${{ github.ref }}  # Check out the feature branch that triggered the workflow
 
-      - name: Checkout the promotion branch
+      - name: Checkout the new-branch-name
         run: |
           git fetch origin
-          git checkout promotion-branch  # Replace with your actual promotion branch name
-          git pull origin promotion-branch
+          git checkout new-branch-name  # Replace with your actual new-branch-name name
+          git pull origin new-branch-name
 
-      - name: Merge feature branch into promotion branch
+      - name: Merge feature branch into new-branch-name
         run: |
-          git merge ${{ github.ref }} --no-ff -m "Merging changes from feature branch ${{ github.ref }} into promotion branch"
-          git push origin promotion-branch  # Replace with your actual promotion branch name
+          git merge ${{ github.ref }} --no-ff -m "Merging changes from feature branch ${{ github.ref }} into new-branch-name"
+          git push origin new-branch-name  # Replace with your actual new-branch-name name
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: "Promote changes from promotion branch to main"
-          body: "This PR merges changes from the promotion branch into main."
+          title: "Promote changes from new-branch-name to main"
+          body: "This PR merges changes from the new-branch-name into main."
           base: main
-          head: promotion-branch  # Replace with your actual promotion branch name
+          head: new-branch-name  # Replace with your actual new-branch-name name
